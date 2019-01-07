@@ -1,0 +1,25 @@
+{
+  "name": "dumpling",
+  "version": "1.0.0",
+  "description": "just dump from PostGIS database; simplified postgis-fs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hfu/dumpling.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/hfu/dumpling/issues"
+  },
+  "homepage": "https://github.com/hfu/dumpling#readme",
+  "dependencies": {
+    "better-queue": "^3.8.10",
+    "config": "^3.0.1",
+    "hjson": "^3.1.2"
+  }
+}

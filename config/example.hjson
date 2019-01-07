@@ -1,0 +1,17 @@
+{
+  host: host
+  port: 5432
+  user: user
+  password: password
+  relations: {
+    database1: [
+      relation1
+      relation2
+    ]
+    database2: [
+      relation3
+      relation4
+    ]
+  }
+  concurrent: 2
+}

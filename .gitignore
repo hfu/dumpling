@@ -1,3 +1,5 @@
+config/default.hjson
+
 # Logs
 logs
 *.log
