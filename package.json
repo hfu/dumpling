@@ -18,8 +18,12 @@
   },
   "homepage": "https://github.com/hfu/dumpling#readme",
   "dependencies": {
+    "@mapbox/tilebelt": "^1.0.1",
+    "@turf/bbox": "^6.0.1",
     "better-queue": "^3.8.10",
     "config": "^3.0.1",
-    "hjson": "^3.1.2"
+    "hjson": "^3.1.2",
+    "pg": "^7.7.1",
+    "wkx": "^0.4.6"
   }
 }
