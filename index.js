@@ -15,11 +15,11 @@ const $startTime = new Date()
 let $count = 0
 let $nTasks = 0
 
-const watch = () => {
+const watch = (relation) => {
   $count++
   if ($count % 10000 === 0) {
     const now = new Date()
-    console.log(`${now.toISOString()}: ${$count} features, ${$nTasks} tasks (${Math.round($count / (now - $startTime) * 1000)}f/s).`)
+    console.log(`${now.toISOString()}: ${$count} f, ${$nTasks} t, ${Math.round($count / (now - $startTime) * 1000)}f/s, ${relation}.`)
   }
 }
 
@@ -30,13 +30,12 @@ const write = (z, x, y, s) => {
     $files[key].pipe(fs.createWriteStream(`${$dst}/${key}.ndjson.gz`))
   }
   $files[key].write(`${s}\n`)
-  watch()
 }
 
 const fetch = (client, t) => {
   return new Promise(resolve => {
     let count = 0
-    client.query(new Query(`FETCH 1000 FROM cur`))
+    client.query(new Query(`FETCH 10000 FROM cur`))
     .on('row', row => {
       delete row.geom
       let f = {
@@ -68,6 +67,7 @@ const fetch = (client, t) => {
 	  queue.resume()
 	}
       }
+      watch(t.relation)
     })
     .on('error', err => {
       console.log(err.stack)
@@ -93,7 +93,7 @@ const queue = new Queue((t, cb) => {
   })
 }, { concurrent: config.get('concurrent') })
 
-for (const database of Object.keys(config.get('relations'))) {
+for (const database of Object.keys(config.get('relations')).reverse()) {
   $pools[database] = new Pool({
     host: config.get('host'),
     user: config.get('user'),
