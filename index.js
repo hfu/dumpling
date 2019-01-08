@@ -15,9 +15,12 @@ const $startTime = new Date()
 let $count = 0
 let $nTasks = 0
 
-const report = () => {
-  const now = new Date()
-  console.log(`${now.toISOString()}: wrote ${$count} features (${Math.round($count / (now - $startTime) * 1000)}f/s).`)
+const watch = () => {
+  $count++
+  if ($count % 10000 === 0) {
+    const now = new Date()
+    console.log(`${now.toISOString()}: ${$count} features, ${$nTasks} tasks (${Math.round($count / (now - $startTime) * 1000)}f/s).`)
+  }
 }
 
 const write = (z, x, y, s) => {
@@ -27,8 +30,7 @@ const write = (z, x, y, s) => {
     $files[key].pipe(fs.createWriteStream(`${$dst}/${key}.ndjson.gz`))
   }
   $files[key].write(`${s}\n`)
-  $count++
-  if ($count % 1000 === 0) report()
+  watch()
 }
 
 const fetch = (client, t) => {
@@ -72,14 +74,13 @@ const fetch = (client, t) => {
       throw err
     })
     .on('end', () => {
-      console.log(count)
       resolve(count)
     })
   })
 }
 
 const queue = new Queue((t, cb) => {
-  console.log(t)
+  // console.log(t)
   $pools[t.database].connect(async (err, client, release) => {
     if (err) throw err
     let cols = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_name='${t.relation}' ORDER BY ordinal_position`)
