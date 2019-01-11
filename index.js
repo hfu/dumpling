@@ -14,6 +14,7 @@ const $files = {}
 const $startTime = new Date()
 let $count = 0
 let $nTasks = 0
+let $nDrains = 0
 
 const watch = (relation) => {
   $count++
@@ -24,19 +25,26 @@ const watch = (relation) => {
 }
 
 const write = (z, x, y, s) => {
-  const key = `${z}-${x}-${y}`
-  if(!$files[key]) {
-    $files[key] = zlib.createGzip()
-    $files[key].pipe(fs.createWriteStream(`${$dst}/${key}.ndjson.gz`))
-  }
-  $files[key].write(`${s}\n`)
+  return new Promise(resolve => {
+    const key = `${z}-${x}-${y}`
+    if(!$files[key]) {
+      $files[key] = zlib.createGzip()
+      $files[key].pipe(fs.createWriteStream(`${$dst}/${key}.ndjson.gz`))
+    }
+    if ($files[key].write(`${s}\n`)) {
+      resolve()
+    } else {
+      $nDrains++
+      $files[key].once('drain', () => { resolve() })
+    }
+  })
 }
 
 const fetch = (client, t) => {
   return new Promise(resolve => {
     let count = 0
     client.query(new Query(`FETCH 10000 FROM cur`))
-    .on('row', row => {
+    .on('row', async row => {
       delete row.geom
       let f = {
         type: 'Feature',
@@ -62,9 +70,7 @@ const fetch = (client, t) => {
       count++
       for (let x = minx; x <= maxx; x++) {
         for (let y = miny; y <= maxy; y++) {
-	  queue.pause()
-	  write($z, x, y, f)
-	  queue.resume()
+	  await write($z, x, y, f)
 	}
       }
       watch(t.relation)
